@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Taller firebase</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css" >
+     <style media="screen">
+       #login{
+         height: 100vh;
+         position: fixed;
+         z-index: 10;
+         width: 100%;
+       }
+     </style>
+  </head>
+  <body>
+    <div id="login" class="white row middle-xs center-xs">
+      <div class="col-xs-12">
+        <div class="box">
+          <p>
+            Debes de iniciar sesión
+          </p>
+          <button type="button" id="start-log" class="btn btn-raised red while-text">
+            Iniciar sesión con google
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" id="app">
+      <div class="col-md-3 col-xs-12">
+        <div class="box">
+            <div class="indigo white-text" style="padding:10px 15px;">
+              Usuarios conectados
+            </div>
+            <ul class="collection" id="users">
+
+            </ul>
+        </div>
+      </div>
+    </div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+    <script  src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="./main.js" charset="utf-8"></script>
+  </body>
+</html>
