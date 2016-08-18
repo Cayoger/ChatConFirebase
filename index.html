@@ -12,6 +12,18 @@
          z-index: 10;
          width: 100%;
        }
+       #app{
+         height: 100vh;
+         width: 100%;
+       }
+       .chat{
+         width: 300px;
+         display: inline-block;
+       }
+       .messages{
+         height: 300px;
+         overflow-y: scroll;
+       }
      </style>
   </head>
   <body>
@@ -39,10 +51,31 @@
             </ul>
         </div>
       </div>
+      <div class="col-xs">
+        <div class="box"  id="chats">
+
+        </div>
+      </div>
     </div>
+
+    <script type="text/x-custom-tamplate" id="hidden-template">
+      <div class="chat" id="${id}">
+        <ul class="messages collection" style="height:400px;">
+
+        </ul>
+        <form class="form">
+          <input type="text" placeholder="Mensaje" class="mensage">
+          <input type="submit" class="btn btn-raised indigo white-text" value="Enviar">
+        </form>
+      </div>
+    </script>
+
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
-    <script  src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script src="./chat.js" charset="utf-8"></script>
     <script src="./main.js" charset="utf-8"></script>
   </body>
 </html>

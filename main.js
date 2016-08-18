@@ -1,110 +1,93 @@
 ;(function(){
-  var config = {
-    apiKey: "AIzaSyBzpzhSKlnl7gAv3z4Y7v9hPQacQUWfIkQ",
-    authDomain: "taller-66817.firebaseapp.com",
-    databaseURL: "https://taller-66817.firebaseio.com",
-    storageBucket: "",
-  };
-  firebase.initializeApp(config);
+    var config = {
+     apiKey: "AIzaSyBzpzhSKlnl7gAv3z4Y7v9hPQacQUWfIkQ",
+     authDomain: "taller-66817.firebaseapp.com",
+     databaseURL: "https://taller-66817.firebaseio.com",
+     storageBucket: "taller-66817.appspot.com",
+   };
+   firebase.initializeApp(config);
 
-  var database = firebase.database();
-  var loginBtn = document.getElementById('start-log');
-  var user = null;
-  var userOn = null;
-  var onKey = null;
-  var roomsRef = null;
+   var database = firebase.database();
+   var btn_log = document.getElementById('start-log');
+   var user = null;
+   var user_ref = null;
+   var user_ref_key = null;
+   var room_ref = null;
 
-  loginBtn.addEventListener("click", googleLog);
-  window.addEventListener("unload",unLogin);
+   btn_log.addEventListener("click", googleLog);
+   window.addEventListener("unload",unLogin);
 
 
-  function googleLog() {
-    var provider = new firebase.auth.GoogleAuthProvider();
+   function googleLog() {
+     var provider = new firebase.auth.GoogleAuthProvider();
 
-    firebase.auth().signInWithPopup(provider)
-            .then(function(result){
-              user = result.user;
-              // console.log(user);
-              // console.log(user.providerData[0].email);
-              $("#login").fadeOut();
-              innitApp();
-            });
-  }
+     firebase.auth().signInWithPopup(provider)
+             .then(function(result){
+               user = result.user;
+               $("#login").fadeOut();
+               innitApp();
+             });
+   }
 
-  function innitApp(){
-    userOn = database.ref("/connected");
-    roomsRef = database.ref("/rooms");
+   function innitApp(){
+     user_ref = database.ref("/connected");
+     room_ref = database.ref("/rooms");
 
-    login(user.uid, user.displayName, user.email, user.photoURL);
+     login(user.uid, user.displayName || user.email);
 
-    userOn.on("child_added",addUser);
-    userOn.on("child_removed",removeUser);
+     user_ref.on("child_added",addUser);
+     user_ref.on("child_removed",removeUser);
 
-  }
+     room_ref.on("child_added",newRoom);
+   }
 
-  function login(uid, name, email, photo){
-    var conectado = userOn.push({
-      uid: uid,
-      name: name,
-      email: email,
-      photo: photo
-    });
+   function login(uid, name){
+     var conectado = user_ref.push({
+       uid: uid,
+       name: name
+     });
 
-    onKey = conectado.key;
-  }
+     user_ref_key = conectado.key;
+   }
 
-  function unLogin() {
-    database.ref("/connected/"+onKey).remove();
-  }
+   function unLogin() {
+     database.ref("/connected/"+user_ref_key).remove();
+   }
 
-  function addUser(data) {
-    //si eres tu no apareces
-    if (data.val().uid == user.uid) return;
-    //si no eres tu se agrega todo lo siguiente
-    //se pone en la lista
-    var $li = $("<li>").addClass("collection-item")
-                        .html(data.val().name)
-                        .attr("id",data.val().uid)
-                        .appendTo("#users");
-    //se crea la notificacion
-    var option = {
-      body:data.val().email,
-      icon:data.val().photo
-    };
-    var notification = new Notification("se conecto: "+data.val().name,option);
-    //si se da click en un li se crea una sala
-    $li.on("click",function(){
-      var friendId = $(this).attr("id");
-
-      var room = roomsRef.push({
-        creator: user.uid,
-        friend: friend
+   function addUser(data) {
+      //  lista, cuando eres tu no apareces en la lista
+      if (data.val().uid == user.uid) return;
+      // variables
+      var mensaje = '<span><strong>'+data.val().name+'</strong> conectado</span>';
+      var friend_id = data.val().uid;
+      // se agrega a la lista
+      var $li = $("<li>").addClass("collection-item")
+      .html(data.val().name)
+      .attr("id",friend_id)
+      .appendTo("#users");
+      // mensaje cuando se conectan
+      Materialize.toast(mensaje, 4000,'indigo');
+      // cuando le das click a la lista
+      $li.on("click",function(){
+        // crea una referencia de chat
+        var room = room_ref.push({
+          creator: user.uid,
+          friend: friend_id
+        });
+        new Chat(room.key,user,"chats",database);
       });
-    });
   }
 
   function removeUser(data) {
     $("#"+data.val().uid).slideUp('fast',function(){
       $(this).remove();
     });
-  }
+   }
 
-  // function notificar() {
-  //   if (!("Notification" in window)) {
-  //     alert("Este navegador no soporta notificaciones");
-  //   } else if (Notification.permission === "granted") {
-  //     var option = {
-  //       body:"hola esto es una notificacion",
-  //       icon:user.photoURL
-  //     };
-  //     var notification = new Notification(user.email,option);
-  //   } else if (Notification.permission !== "denied") {
-  //     Notification.requestPermission(function (permission) {
-  //       if (permission === "granted") {
-  //         var notification = new Notification("Hi there!");
-  //       }
-  //     });
-  //   }
-  // }
-  //
-})();
+   function newRoom(data) {
+     if (data.val().friend == user.uid) {
+       new Chat(data.key,user,"chats",database);
+     }
+   }
+
+ })();
